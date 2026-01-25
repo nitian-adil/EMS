@@ -4,55 +4,32 @@ const auth = require("../middleware/authMiddleware");
 const role = require("../middleware/roleMiddleware");
 const {
   assignTask,
-  completeTask
+  getMyTasks,
+  updateTaskStatus,
+  acceptTask,
+  rejectTask,
+  completeTask,
+  getAllTasks
+
 } = require("../controller/TaskController");
-const Task = require("../models/TaskModel");
 
 /**
- * Admin assigns task
+ * ADMIN assigns task
  */
-router.post(
-  "/",
-  auth,
-  role("ADMIN"),
-  assignTask
-);
+router.post("/assign",auth, role("ADMIN"), assignTask);
+router.get("/", auth, role("ADMIN"), getAllTasks);
 
 /**
- * Employee views assigned tasks
+ * EMPLOYEE gets assigned tasks
  */
-router.get(
-  "/my",
-  auth,
-  role("EMPLOYEE"),
-  async (req, res) => {
-    const tasks = await Task.find({ assignedTo: req.user._id });
-    res.json(tasks);
-  }
-);
+router.get("/my", auth, role("EMPLOYEE"), getMyTasks);
 
 /**
- * Admin views all tasks
+ * EMPLOYEE updates task status
  */
-router.get(
-  "/",
-  auth,
-  role("ADMIN"),
-  async (req, res) => {
-    const tasks = await Task.find()
-      .populate("assignedTo assignedBy", "name role");
-    res.json(tasks);
-  }
-);
-
-/**
- * Employee marks task as completed
- */
-router.put(
-  "/:id/complete",
-  auth,
-  role("EMPLOYEE"),
-  completeTask
-);
+router.patch("/:id/:action", auth, role("EMPLOYEE"), updateTaskStatus);
+router.patch("/tasks/:id/accept", auth, role("EMPLOYEE"), acceptTask);
+router.patch("/tasks/:id/reject", auth, role("EMPLOYEE"), rejectTask);
+router.patch("/tasks/:id/complete", auth, role("EMPLOYEE"), completeTask);
 
 module.exports = router;

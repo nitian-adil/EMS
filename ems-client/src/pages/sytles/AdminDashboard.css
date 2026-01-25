@@ -287,3 +287,67 @@
 
 /* Add more styling for tables and cards as needed */
 
+
+.assign-task-panel {
+  background-color: #e5e7eb; /* light grey (admin theme) */
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Headings inside assign task */
+.assign-task-panel h3 {
+  color: #1f2937;
+  margin-bottom: 15px;
+}
+
+/* Form background slightly darker */
+.assign-task-panel .task-form {
+  background-color: #f3f4f6;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+
+/* Inputs */
+.assign-task-panel input,
+.assign-task-panel textarea {
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+}
+
+/* Assign button – admin green */
+.assign-task-panel button[type="submit"] {
+  background-color: #1f2937;
+  color: white;
+}
+
+.assign-task-panel button[type="submit"]:hover {
+  background-color: #111827;
+}
+.assign-task-panel .admin-table {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* TASK STATUS COLORS */
+.status.pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status.accepted {
+  background-color: #dcfce7; /* light green */
+  color: #166534;           /* dark green */
+}
+
+.status.completed {
+  background-color: #bbf7d0;
+  color: #065f46;
+}
+
+.status.rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}

@@ -1,18 +1,34 @@
-// models/Task.js
 const mongoose = require("mongoose");
 
 const taskSchema = new mongoose.Schema(
   {
-    title: String,
-    description: String,
-    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    assignedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    assignedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    deadline: {
+  type: Date,
+  required: true,
+},
+
     status: {
       type: String,
-      enum: ["PENDING", "COMPLETED"],
-      default: "PENDING",
+      enum: ["ASSIGNED", "ACCEPTED", "REJECTED", "COMPLETED"],
+      default: "ASSIGNED",
     },
-    dueDate: Date,
   },
   { timestamps: true }
 );

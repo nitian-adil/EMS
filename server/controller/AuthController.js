@@ -45,6 +45,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    
 
     const user = await User.findOne({ email });
     if (!user)
@@ -55,7 +56,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
-
+    // console.log(user.name)
     res.json({
       token,
       role: user.role,
@@ -65,3 +66,33 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+exports.fetchEmployees = async(req,res)=>{
+
+const users = await User.find().select("-password");
+  res.json(users);
+}
+
+exports.deleteEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+
+exports.fetchLoggedInUser=async(req,res)=>{
+    const user = await User.findById(req.user.id).select("-password");
+    // console.log(user)
+  res.json(user);
+}

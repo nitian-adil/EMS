@@ -2,12 +2,22 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../sytles/AdminDashboard.css";
 import api from "../axios";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
   const [leaves, setLeaves] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [assignedTasks, setAssignedTasks] = useState([]);
   const [task, setTask] = useState({
     employeeId: "",
     title: "",
@@ -16,6 +26,23 @@ const AdminDashboard = () => {
   });
   const [activePanel, setActivePanel] = useState(""); // Tracks which panel to show
   const [loggedInUserId, setLoggedInUser] = useState(null);
+  const roleCounts = {
+  ADMIN: employees.filter((e) => e.role === "ADMIN").length,
+  HR: employees.filter((e) => e.role === "HR").length,
+  EMPLOYEE: employees.filter((e) => e.role === "EMPLOYEE").length,
+};
+const user = JSON.parse(localStorage.getItem("user"));
+const adminName = user?.name || "Admin";
+
+
+const pieData = [
+  { name: "Admin", value: roleCounts.ADMIN },
+  { name: "HR", value: roleCounts.HR },
+  { name: "Employee", value: roleCounts.EMPLOYEE },
+];
+
+const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
+
 
   const token = localStorage.getItem("token");
 
@@ -51,6 +78,19 @@ const AdminDashboard = () => {
     }
   };
 
+  //fetch tasks
+  const fetchTasks = async () => {
+    try {
+      const res = await api.get("/tasks", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAssignedTasks(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
   // Fetch leave requests
   const fetchLeaves = async () => {
     try {
@@ -67,6 +107,7 @@ const AdminDashboard = () => {
     fetchLeaves();
     fetchEmployees();
     fetchLoggedInUser();
+    fetchTasks();
   }, []);
 
   // Update leave status
@@ -132,7 +173,10 @@ const AdminDashboard = () => {
       <nav className="admin-navbar">
         <h2>Admin Panel</h2>
         <div className="admin-nav-right">
-          <span className="admin-welcome">Welcome, Admin 👋</span>
+<span className="admin-welcome">
+  Welcome, {adminName}
+</span>
+
           <button className="admin-logout-btn" onClick={handleLogout}>
             Logout
           </button>
@@ -142,9 +186,15 @@ const AdminDashboard = () => {
       <div className="dashboard-body">
         {/* Sidebar */}
         <aside className="admin-sidebar">
+
+ <button onClick={() => setActivePanel("")}>
+            🏠 Home
+          </button>
+
           <button onClick={() => setActivePanel("leaves")}>
             🔔 Leave Requests
           </button>
+         
           <button onClick={() => setActivePanel("assignTask")}>
             📌 Assign Task
           </button>
@@ -155,11 +205,42 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <main className="admin-main">
-          {activePanel === "" && (
-            <div className="blank-panel">
-              <h2>Select a panel from sidebar</h2>
-            </div>
-          )}
+
+          
+        {activePanel === "" && (
+  <div className="admin-home">
+    <h2>Admin Dashboard</h2>
+    <p>Company Role Distribution</p>
+
+    <div style={{ width: "100%", height: 350 }}>
+      <ResponsiveContainer>
+        <PieChart>
+          <Pie
+            data={pieData}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={120}
+            label
+          >
+            {pieData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
+          </Pie>
+
+          <Tooltip />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+)}
+
+
 
           {/* Leave Requests Panel */}
           {activePanel === "leaves" && (
@@ -174,17 +255,23 @@ const AdminDashboard = () => {
                       <th>Employee</th>
                       <th>Type</th>
                       <th>From</th>
+                      <th>Description</th>
                       <th>To</th>
                       <th>Status</th>
+
                     </tr>
                   </thead>
                   <tbody>
                     {leaves.map((leave) => (
                       <tr key={leave._id}>
                         <td>{leave.employee?.name}</td>
+
                         <td>{leave.leaveType}</td>
                         <td>
                           {new Date(leave.fromDate).toLocaleDateString()}
+                        </td>
+                        <td>
+                          {(leave.reason)}
                         </td>
                         <td>
                           {new Date(leave.toDate).toLocaleDateString()}
@@ -227,8 +314,10 @@ const AdminDashboard = () => {
 
           {/* Assign Task Panel */}
           {activePanel === "assignTask" && (
-            <section>
-              <h3>Assign Task</h3>
+  <section className="assign-task-panel">
+                  <h3>Assign Task</h3>
+
+              {/* ASSIGN FORM */}
               <form className="task-form" onSubmit={handleAssignTask}>
                 <input
                   type="text"
@@ -258,12 +347,47 @@ const AdminDashboard = () => {
                   name="deadline"
                   value={task.deadline}
                   onChange={handleTaskChange}
+                  min={new Date().toISOString().split("T")[0]}
                   required
                 />
                 <button type="submit">Assign Task</button>
               </form>
+
+              {/* ASSIGNED TASKS TABLE */}
+              <h3 style={{ marginTop: "30px" }}>Assigned Tasks</h3>
+
+              {assignedTasks.length === 0 ? (
+                <p>No tasks assigned yet</p>
+              ) : (
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Title</th>
+                      <th>Deadline</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {assignedTasks.map((task) => (
+                      <tr key={task._id}>
+                        <td>{task.assignedTo?.name}</td>
+                        <td>{task.title}</td>
+                        <td>{new Date(task.deadline).toLocaleDateString()}</td>
+                        <td>
+                          <span className={`status ${task.status.toLowerCase()}`}>
+                            {task.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+
+                  </tbody>
+                </table>
+              )}
             </section>
           )}
+
 
           {/* Employees Panel */}
           {activePanel === "employees" && (

@@ -23,6 +23,7 @@ export default function LeaveNotifications() {
         <div key={leave._id} className="card">
           <p><b>{leave.employee?.name}</b></p>
           <p>{leave.leaveType}</p>
+          <p>{leave.reason}</p>
           <p>Status: {leave.status}</p>
           
         </div>

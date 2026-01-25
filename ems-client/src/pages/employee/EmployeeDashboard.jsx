@@ -6,7 +6,7 @@ import "../sytles/EmployeeDashboard.css";
 export default function EmployeeDashboard() {
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState("apply");
+  const [activeTab, setActiveTab] = useState("home");
   const [tasks, setTasks] = useState([]);
 
   const [form, setForm] = useState({
@@ -27,18 +27,18 @@ export default function EmployeeDashboard() {
 
   //-----------------fetch my task --------------
   const fetchMyTasks = async () => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    const res = await api.get("/tasks/my", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      const res = await api.get("/tasks/my", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    setTasks(res.data);
-  } catch (err) {
-    console.error(err);
-  }
-};
+      setTasks(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
 
   // ---------------- APPLY LEAVE ----------------
@@ -47,24 +47,35 @@ export default function EmployeeDashboard() {
   };
 
 
-//------------------------Take action ---------------
-const handleTaskAction = async (taskId, action) => {
+  const totalTasks = tasks.length;
+const pendingTasks = tasks.filter(
+  (t) => t.status === "ASSIGNED" || t.status === "ACCEPTED"
+).length;
+const completedTasks = tasks.filter((t) => t.status === "COMPLETED").length;
+
+const totalLeaves = myLeaves.length;
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+
+  //------------------------Take action ---------------
+ const handleTaskAction = async (taskId, action) => {
   try {
     const token = localStorage.getItem("token");
 
-    await api.get(
+    await api.patch(
       `/tasks/${taskId}/${action}`,
-      {},
+      {}, // no body needed
       {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
 
     alert(`Task ${action}ed successfully`);
-    fetchMyTasks();
+    fetchMyTasks(); // refresh UI
   } catch (err) {
     console.error(err);
-    alert("Failed to update task");
+    alert(err.response?.data?.message || "Failed to update task");
   }
 };
 
@@ -126,7 +137,7 @@ const handleTaskAction = async (taskId, action) => {
 
   useEffect(() => {
     fetchMyLeaves();
-      fetchMyTasks();
+    fetchMyTasks();
   }, []);
 
   return (
@@ -136,6 +147,15 @@ const handleTaskAction = async (taskId, action) => {
         <h2 className="sidebar-title">Employee Panel</h2>
 
         <ul className="sidebar-menu">
+
+<li
+  className={`sidebar-item ${activeTab === "home" ? "active" : ""}`}
+  onClick={() => setActiveTab("home")}
+>
+  Home
+</li>
+
+
           <li
             className={`sidebar-item ${activeTab === "apply" ? "active" : ""}`}
             onClick={() => setActiveTab("apply")}
@@ -143,11 +163,11 @@ const handleTaskAction = async (taskId, action) => {
             Apply Leave
           </li>
           <li
-  className={`sidebar-item ${activeTab === "tasks" ? "active" : ""}`}
-  onClick={() => setActiveTab("tasks")}
->
-  My Tasks
-</li>
+            className={`sidebar-item ${activeTab === "tasks" ? "active" : ""}`}
+            onClick={() => setActiveTab("tasks")}
+          >
+            My Tasks
+          </li>
 
 
           <li
@@ -166,6 +186,48 @@ const handleTaskAction = async (taskId, action) => {
       {/* MAIN CONTENT */}
       <main className="main-content">
         {/* APPLY LEAVE */}
+
+{activeTab === "home" && (
+  <div className="employee-home">
+    <h2 className="dashboard-heading">
+      Welcome {user?.name || "Employee"} 👋
+    </h2>
+
+    <p className="home-date">
+      {new Date().toLocaleDateString("en-IN", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })}
+    </p>
+
+    <div className="home-cards">
+      <div className="home-card">
+        <h3>{totalTasks}</h3>
+        <p>Total Tasks</p>
+      </div>
+
+      <div className="home-card warning">
+        <h3>{pendingTasks}</h3>
+        <p>Pending Tasks</p>
+      </div>
+
+      <div className="home-card success">
+        <h3>{completedTasks}</h3>
+        <p>Completed Tasks</p>
+      </div>
+
+      <div className="home-card info">
+        <h3>{totalLeaves}</h3>
+        <p>Leave Requests</p>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
         {activeTab === "apply" && (
           <>
             <h2 className="dashboard-heading">Apply for Leave</h2>
@@ -233,22 +295,22 @@ const handleTaskAction = async (taskId, action) => {
                       </span>
                     </div>
 
-                    <div className="leave-card-body">
-                      <p>
-                        <strong>From:</strong>{" "}
-                        {new Date(leave.fromDate).toLocaleDateString()}
-                      </p>
+                   <div className="leave-card-body">
+  <p>
+    <strong>Reason:</strong> {leave.reason}
+  </p>
 
-                      <p>
-                        <strong>To:</strong>{" "}
-                        {new Date(leave.toDate).toLocaleDateString()}
-                      </p>
+  <p>
+    <strong>From:</strong>{" "}
+    {new Date(leave.fromDate).toLocaleDateString()}
+  </p>
 
-                      <p>
-                        <strong>Applied On:</strong>{" "}
-                        {new Date(leave.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
+  <p>
+    <strong>To:</strong>{" "}
+    {new Date(leave.toDate).toLocaleDateString()}
+  </p>
+</div>
+
 
                     <div className="leave-card-footer">
                       <strong>Remark:</strong>{" "}
@@ -276,82 +338,91 @@ const handleTaskAction = async (taskId, action) => {
         )}
 
 
-{/* //Task  
+        {/* //Task  
 // */}
 
-{activeTab === "tasks" && (
-  <>
-    <h2 className="dashboard-heading">My Tasks</h2>
+        {activeTab === "tasks" && (
+          <>
+            <h2 className="dashboard-heading">My Tasks</h2>
 
-    {tasks.length === 0 ? (
-      <p>No tasks assigned</p>
-    ) : (
-      <div className="leave-card-container">
-        {tasks.map((task) => (
-          <div className="leave-card" key={task._id}>
-            <div className="leave-card-header">
-              <h3>{task.title}</h3>
-              <span className={`status ${task.status.toLowerCase()}`}>
-                {task.status}
-              </span>
-            </div>
+            {tasks.length === 0 ? (
+              <p>No tasks assigned</p>
+            ) : (
+              <div className="leave-card-container">
+                {tasks.map((task) => (
+                  <div className="leave-card" key={task._id}>
+                    <div className="leave-card-header">
+                      <h3>{task.title}</h3>
+                      <span className={`status ${task.status.toLowerCase()}`}>
+                        {task.status}
+                      </span>
+                    </div>
 
-            <div className="leave-card-body">
-              <p>
-                <strong>Description:</strong> {task.description}
-              </p>
-              <p>
-                <strong>Assigned On:</strong>{" "}
-                {new Date(task.createdAt).toLocaleDateString()}
-              </p>
-            </div>
+        <div className="leave-card-body">
+  <p>
+    <strong>Description:</strong> {task.description}
+  </p>
 
-            <div className="leave-card-footer task-actions">
-              {task.status === "ASSIGNED" && (
-                <>
-                  <button
-                    className="btn accept"
-                    onClick={() =>
-                      handleTaskAction(task._id, "accept")
-                    }
-                  >
-                    Accept
-                  </button>
+  <p>
+    <strong>Assigned On:</strong>{" "}
+    {new Date(task.createdAt).toLocaleDateString()}
+  </p>
 
-                  <button
-                    className="btn reject"
-                    onClick={() =>
-                      handleTaskAction(task._id, "reject")
-                    }
-                  >
-                    Reject
-                  </button>
-                </>
-              )}
+  {task.deadline && (
+    <p>
+      <strong>Deadline:</strong>{" "}
+      {new Date(task.deadline).toLocaleDateString()}
+    </p>
+  )}
+</div>
 
-              {task.status === "ACCEPTED" && (
-                <button
-                  className="btn complete"
-                  onClick={() =>
-                    handleTaskAction(task._id, "complete")
-                  }
-                >
-                  Mark Complete
-                </button>
-              )}
 
-              {task.status === "COMPLETED" && (
-                <span className="remark approved">
-                  Task Completed
-                </span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </>
-)}
+                    <div className="leave-card-footer task-actions">
+                      {task.status === "ASSIGNED" && (
+                        <>
+                          <button
+                            className="btn accept"
+                            onClick={() =>
+                              handleTaskAction(task._id, "accept")
+                            }
+                          >
+                            Accept
+                          </button>
+
+                          <button
+                            className="btn reject"
+                            onClick={() =>
+                              handleTaskAction(task._id, "reject")
+                            }
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+
+                      {task.status === "ACCEPTED" && (
+                        <button
+                          className="btn complete"
+                          onClick={() =>
+                            handleTaskAction(task._id, "complete")
+                          }
+                        >
+                          Mark Complete
+                        </button>
+                      )}
+
+                      {task.status === "COMPLETED" && (
+                        <span className="remark approved">
+                          Task Completed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
 
       </main>
     </div>
