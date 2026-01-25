@@ -1,0 +1,101 @@
+/* Centered fade-in animation */
+/* Reset default browser margins */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: 'Inter', sans-serif; /* optional for better look */
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* Blue login box */
+.login-box {
+  background-color: #1e3a8a; /* dark blue */
+  color: #f3f4f6; /* light text */
+  border-radius: 1rem;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px; /* controls the box width */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+
+/* Input fields inside blue box */
+.login-box input {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1; /* Tailwind gray-300 */
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Focus effect for input */
+.login-box input:focus {
+  border-color: #3b82f6; /* Tailwind blue-500 */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+}
+
+/* Button style */
+.login-box button {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  background-color: #2563eb; /* Tailwind blue-600 */
+  color: #f3f4f6;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Button hover */
+.login-box button:hover {
+  background-color: #1d4ed8; /* Tailwind blue-700 */
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Links */
+.login-box a {
+  color: #93c5fd; /* Tailwind blue-300 */
+  text-decoration: underline;
+}
+
+.login-box a:hover {
+  color: #bfdbfe; /* Tailwind blue-200 */
+}
+
+/* Form heading */
+.login-box h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+}
+/* Wrapper full screen and center */
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #bfdbfe 0%, #60a5fa 100%);
+}
