@@ -9,12 +9,14 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import HRDashboard from "./pages/hr/HRDashboard"
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import LandingPage from "./components/LandinPage";
 
 function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/" element={<Register />} />
+      <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
       <Route
         path="/admin"

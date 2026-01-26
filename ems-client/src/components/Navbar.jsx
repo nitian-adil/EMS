@@ -1,37 +1,30 @@
-import { useNavigate } from "react-router-dom";
-import "./Navbar.css";
+
+
+import { Link } from "react-router-dom";
+import "../pages/sytles/Navbar.css";
 
 const Navbar = () => {
-  const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
-
-  const getGreeting = () => {
-    if (!user) return "Hello";
-
-    if (user.role === "ADMIN") return "Hello Admin 👋";
-    if (user.role === "HR") return "Hello HR 👋";
-    return `Hello ${user.name} 👋`;
-  };
-
   return (
     <nav className="navbar">
-      <h2 className="navbar-logo">EMS</h2>
+      {/* COMPANY LOGO */}
+      <div className="logo">
+        <Link to="/" className="logo-text">WorkNest</Link>
+      </div>
 
-      <div className="navbar-right">
-        <span className="navbar-greeting">{getGreeting()}</span>
-        <button onClick={handleLogout} className="logout-btn">
-          Logout
-        </button>
+      {/* NAV LINKS */}
+      <ul className="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+
+      {/* AUTH BUTTONS */}
+      <div className="auth-buttons">
+        <Link to="/login" className="btn-login">Login</Link>
+        <Link to="/register" className="btn-register">Register</Link>
       </div>
     </nav>
   );
 };
 
 export default Navbar;
-    

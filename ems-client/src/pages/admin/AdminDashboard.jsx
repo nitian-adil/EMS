@@ -50,7 +50,7 @@ const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/login");
+    navigate("/");
   };
 
   // Fetch employees

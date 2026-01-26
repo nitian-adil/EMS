@@ -4,6 +4,12 @@
   padding: 2rem;
   text-align: center;
 }
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(120deg, #0f172a, #1e293b);
+}
+
 
 .logo {
   height: 6em;
