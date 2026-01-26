@@ -1,246 +1,168 @@
-HR DASHBOARD - VERY LIGHT PURPLE THEME WITH BLACK TEXT
+/* ========== HR DASHBOARD (PURPLE + WHITE) ========== */
 body, html {
   margin: 0;
   font-family: "Segoe UI", sans-serif;
   height: 100%;
-  background-color: #f7f5fc; /* very light purple background */
-  color: #000; /* black text globally */
+  background-color: #f9f9f9;
+  color: #1f1f1f;
+    font-size: 14px; /* was default ~16px */
 }
 
 /* NAVBAR */
-.admin-navbar {
+.hr-navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #c4b5fd; /* light purple */
-  color: #000; /* black text */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  background-color: #641ddf; /* medium purple */
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-.admin-navbar h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-}
+.hr-navbar h2 { font-size: 1.3rem; font-weight: 600; }
 
-.admin-nav-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
+.hr-nav-right { display: flex; align-items: center; gap: 15px; }
 
-.admin-welcome {
-  font-size: 16px;
-  font-weight: 500;
-}
+.hr-welcome { font-size: 14px; font-weight: 500; }
 
-.admin-logout-btn {
-  background-color: #a78bfa; /* medium purple */
-  color: #000;
+.hr-logout-btn {
+  background-color: #a78bfa;
+  color: #fff;
   border: none;
   padding: 6px 14px;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  transition: 0.3s;
 }
 
-.admin-logout-btn:hover {
-  background-color: #7c3aed; /* darker purple on hover */
-  color: #fff;
-}
+.hr-logout-btn:hover { background-color: #5b21b6; }
 
 /* DASHBOARD BODY */
-.dashboard-body {
-  display: flex;
-  height: calc(100vh - 68px); /* adjust navbar height */
-}
+.hr-dashboard-body { display: flex; height: calc(100vh - 68px); }
 
 /* SIDEBAR */
-.admin-sidebar {
+.hr-sidebar {
   width: 220px;
-  background-color: #d8b4fe; /* very light purple */
-  color: #000;
+  background-color: #5b21b6; /* dark purple */
+  color: #fff;
   display: flex;
   flex-direction: column;
   padding: 1rem;
 }
 
-.admin-sidebar button {
+.hr-sidebar button {
   margin: 0.5rem 0;
+    font-size: 14px;
   padding: 0.6rem 1rem;
-  background-color: #e9d5ff; /* lighter purple for buttons */
+  background-color: #7c3aed; /* medium purple */
   border: none;
-  color: #000; /* black text */
+  color: #fff;
   border-radius: 6px;
   cursor: pointer;
   text-align: left;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: 0.2s;
 }
 
-.admin-sidebar button:hover {
-  background-color: #c4b5fd; /* medium purple on hover */
-  color: #000;
+.hr-sidebar button:hover { background-color: #a78bfa; }
+
+.hr-pending-count {
+  background-color: #f43f5e;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  margin-left: 5px;
 }
 
 /* MAIN CONTENT */
-.admin-main {
+.hr-main {
   flex: 1;
   padding: 1.5rem;
-  background-color: #f7f5fc; /* very light purple background */
+  background-color: #fff;
   overflow-y: auto;
-  color: #000; /* black text */
+  color: #1f1f1f;
 }
 
-/* HOME / PIE CHART */
-.admin-home h2 {
-  color: #000;
-  margin-bottom: 0.5rem;
-}
-
-.admin-home p {
-  color: #000;
-}
+/* HOME / CHARTS */
+.hr-home h2 { margin-bottom: 0.5rem; }
+.hr-home p { margin-bottom: 1rem; }
 
 /* TABLES */
-.admin-table {
+.hr-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
-  background: #ffffff; /* white for table */
+  background: #fff;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  color: #000; /* black text */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.admin-table th, .admin-table td {
-  padding: 12px;
-  text-align: left;
-  color: #000;
+.hr-table th, .hr-table td { font-size: 13px;
+  padding: 10px;
+   text-align: left; }
+
+.hr-table th { background-color: #f3e8ff; }
+.hr-status {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-.admin-table th {
-  background-color: #e0caff; /* very light purple */
-}
 
 /* STATUS BADGES */
-.status.pending {
-  background-color: #f3e8ff;
-  color: #000;
-}
+.hr-status.pending {   background-color: #f3e8ff; color: #4c1d95;padding: 3px 8px; border-radius: 6px; }
+.hr-status.approved {   background-color: #dcfce7;color: #166534; padding: 3px 8px; border-radius: 6px; }
+.hr-status.rejected {   background-color: #fee2e2;color: #991b1b; padding: 3px 8px; border-radius: 6px; }
 
-.status.approved,
-.status.accepted,
-.status.completed {
-  background-color: #d8b4fe;
-  color: #000;
-}
-
-.status.rejected {
-  background-color: #fbcfe8;
-  color: #000;
-}
-
-/* ASSIGN TASK PANEL */
-.assign-task-panel {
-  background-color: #f3e8ff; /* very light purple */
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-  color: #000;
-}
-
-.assign-task-panel h3 {
-  margin-bottom: 15px;
-  color: #000;
-}
-
-.assign-task-panel .task-form {
-  background-color: #ffffff; /* white form background */
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 30px;
-}
-
-.assign-task-panel input,
-.assign-task-panel textarea {
-  background-color: #f7f5fc; /* very light purple input */
-  border: 1px solid #d1c4fc;
-  color: #000;
-  padding: 10px;
-  border-radius: 6px;
-}
-
-.assign-task-panel button[type="submit"] {
-  background-color: #9f7aea; /* medium purple button */
-  color: #000;
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.assign-task-panel button[type="submit"]:hover {
-  background-color: #7c3aed; /* darker purple on hover */
-  color: #fff;
-}
+/* ASSIGN TASK */
+.hr-assign-task-panel { background-color: #f3f3f3; padding: 25px; border-radius: 12px; }
+.hr-task-form { background-color: #fff; padding: 20px; border-radius: 10px; display: flex; flex-direction: column; gap: 10px; }
+.hr-task-form input, .hr-task-form textarea { padding: 10px; border-radius: 6px; border: 1px solid #d1c4fc; }
+.hr-task-form button { padding: 10px; border-radius: 6px; border: none; background-color: #a78bfa; color: #fff; cursor: pointer; }
+.hr-task-form button:hover { background-color: #7c3aed; }
 
 /* EMPLOYEE GRID */
-.employee-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-top: 15px;
+.hr-employee-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 15px; }
+.hr-employee-card { background-color: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+.hr-role-badge { display: inline-block; margin-top: 8px; padding: 4px 10px; font-size: 12px; background: #c4b5fd; border-radius: 20px; }
+
+/* Leave Actions Buttons */
+.hr-leave-actions {
+  display: flex;
+  gap: 8px;
 }
 
-.employee-card {
-  background-color: #ffffff;
-  color: #000;
-  padding: 16px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  transition: transform 0.2s ease;
-}
-
-.employee-card:hover {
-  transform: translateY(-4px);
-}
-
-.role-badge {
-  display: inline-block;
-  margin-top: 8px;
-  padding: 4px 10px;
-  font-size: 12px;
-  background: #e9d5ff; /* very light purple */
-  color: #000;
-  border-radius: 20px;
-}
-
-/* DELETE BUTTON */
-.delete-badge {
-  padding: 6px 14px;
-  background-color: #f3c6f2; /* light pink-purple */
-  color: #000;
-  font-size: 13px;
-  font-weight: 600;
+.hr-approve-btn {
+  background-color: #22c55e; /* green */
+  color: #fff;
   border: none;
+    font-size: 13px;
+  padding: 5px 10px;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 500;
   transition: all 0.2s ease;
 }
 
-.delete-badge:hover {
-  background-color: #c084fc;
-  color: #fff;
-  box-shadow: 0 3px 8px rgba(192, 132, 252, 0.4);
-  transform: translateY(-1px);
+.hr-approve-btn:hover {
+  background-color: #16a34a; /* darker green */
 }
 
-.delete-badge:disabled {
-  background-color: #f3e8ff;
-  cursor: not-allowed;
-  box-shadow: none;
+.hr-reject-btn {
+  background-color: #ef4444; /* red */
+  color: #fff;
+  border: none;
+  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.hr-reject-btn:hover {
+  background-color: #b91c1c; /* darker red */
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../sytles/AdminDashboard.css";
+import '../sytles/AdminDashboard.css'
 import api from "../axios";
 import {
   PieChart,
@@ -11,10 +11,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-
 const AdminDashboard = () => {
   const navigate = useNavigate();
-
   const [leaves, setLeaves] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [assignedTasks, setAssignedTasks] = useState([]);
@@ -24,27 +22,27 @@ const AdminDashboard = () => {
     description: "",
     deadline: "",
   });
-  const [activePanel, setActivePanel] = useState(""); // Tracks which panel to show
+  const [activePanel, setActivePanel] = useState("");
   const [loggedInUserId, setLoggedInUser] = useState(null);
-  const roleCounts = {
-  ADMIN: employees.filter((e) => e.role === "ADMIN").length,
-  HR: employees.filter((e) => e.role === "HR").length,
-  EMPLOYEE: employees.filter((e) => e.role === "EMPLOYEE").length,
-};
-const user = JSON.parse(localStorage.getItem("user"));
-const adminName = user?.name || "Admin";
 
-
-const pieData = [
-  { name: "Admin", value: roleCounts.ADMIN },
-  { name: "HR", value: roleCounts.HR },
-  { name: "Employee", value: roleCounts.EMPLOYEE },
-];
-
-const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
-
+  const user = JSON.parse(localStorage.getItem("user"));
+  const adminName = user?.name || "Admin";
 
   const token = localStorage.getItem("token");
+
+  const roleCounts = {
+    ADMIN: employees.filter((e) => e.role === "ADMIN").length,
+    HR: employees.filter((e) => e.role === "HR").length,
+    EMPLOYEE: employees.filter((e) => e.role === "EMPLOYEE").length,
+  };
+
+  const pieData = [
+    { name: "Admin", value: roleCounts.ADMIN },
+    { name: "HR", value: roleCounts.HR },
+    { name: "Employee", value: roleCounts.EMPLOYEE },
+  ];
+
+  const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
 
   // 🔴 LOGOUT
   const handleLogout = () => {
@@ -78,7 +76,7 @@ const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
     }
   };
 
-  //fetch tasks
+  // Fetch tasks
   const fetchTasks = async () => {
     try {
       const res = await api.get("/tasks", {
@@ -90,8 +88,7 @@ const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
     }
   };
 
-
-  // Fetch leave requests
+  // Fetch leaves
   const fetchLeaves = async () => {
     try {
       const res = await api.get("/leaves", {
@@ -119,7 +116,6 @@ const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Update UI instantly
       setLeaves((prev) =>
         prev.map((leave) =>
           leave._id === leaveId ? { ...leave, status } : leave
@@ -173,76 +169,61 @@ const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
       <nav className="admin-navbar">
         <h2>Admin Panel</h2>
         <div className="admin-nav-right">
-<span className="admin-welcome">
-  Welcome, {adminName}
-</span>
-
+          <span className="admin-welcome">Welcome, {adminName}</span>
           <button className="admin-logout-btn" onClick={handleLogout}>
             Logout
           </button>
         </div>
       </nav>
 
-      <div className="dashboard-body">
+      <div className="admin-dashboard-body">
         {/* Sidebar */}
         <aside className="admin-sidebar">
-
- <button onClick={() => setActivePanel("")}>
-            🏠 Home
-          </button>
-
-          <button onClick={() => setActivePanel("leaves")}>
-            🔔 Leave Requests
-          </button>
-         
-          <button onClick={() => setActivePanel("assignTask")}>
-            📌 Assign Task
-          </button>
-          <button onClick={() => setActivePanel("employees")}>
-            👥 Employees
-          </button>
+          <button onClick={() => setActivePanel("")}>🏠 Home</button>
+<button onClick={() => setActivePanel("leaves")}>
+  🔔 Leave Requests
+  {leaves.filter(l => l.status === "PENDING").length > 0 && (
+    <span className="pending-count">
+      {leaves.filter(l => l.status === "PENDING").length}
+    </span>
+  )}
+</button>
+          <button onClick={() => setActivePanel("assignTask")}>📌 Assign Task</button>
+          <button onClick={() => setActivePanel("employees")}>👥 Employees</button>
         </aside>
 
         {/* Main Content */}
         <main className="admin-main">
+          {/* Home Panel */}
+          {activePanel === "" && (
+            <div className="admin-home">
+              <h2>Admin Dashboard</h2>
+              <p>Company Role Distribution</p>
+              <div style={{ width: "100%", height: 350 }}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={120}
+                      label
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
 
-          
-        {activePanel === "" && (
-  <div className="admin-home">
-    <h2>Admin Dashboard</h2>
-    <p>Company Role Distribution</p>
-
-    <div style={{ width: "100%", height: 350 }}>
-      <ResponsiveContainer>
-        <PieChart>
-          <Pie
-            data={pieData}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={120}
-            label
-          >
-            {pieData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </Pie>
-
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
-    </div>
-  </div>
-)}
-
-
-
-          {/* Leave Requests Panel */}
+          {/* Leave Requests */}
           {activePanel === "leaves" && (
             <section>
               <h3>Leave Requests</h3>
@@ -258,48 +239,34 @@ const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
                       <th>Description</th>
                       <th>To</th>
                       <th>Status</th>
-
                     </tr>
                   </thead>
                   <tbody>
                     {leaves.map((leave) => (
                       <tr key={leave._id}>
                         <td>{leave.employee?.name}</td>
-
                         <td>{leave.leaveType}</td>
-                        <td>
-                          {new Date(leave.fromDate).toLocaleDateString()}
-                        </td>
-                        <td>
-                          {(leave.reason)}
-                        </td>
-                        <td>
-                          {new Date(leave.toDate).toLocaleDateString()}
-                        </td>
+                        <td>{new Date(leave.fromDate).toLocaleDateString()}</td>
+                        <td>{leave.reason}</td>
+                        <td>{new Date(leave.toDate).toLocaleDateString()}</td>
                         <td>
                           {leave.status === "PENDING" ? (
                             <div className="leave-actions">
                               <button
                                 className="approve-btn"
-                                onClick={() =>
-                                  updateLeaveStatus(leave._id, "APPROVED")
-                                }
+                                onClick={() => updateLeaveStatus(leave._id, "APPROVED")}
                               >
                                 ✔ Approve
                               </button>
                               <button
                                 className="reject-btn"
-                                onClick={() =>
-                                  updateLeaveStatus(leave._id, "REJECTED")
-                                }
+                                onClick={() => updateLeaveStatus(leave._id, "REJECTED")}
                               >
                                 ✖ Reject
                               </button>
                             </div>
                           ) : (
-                            <span
-                              className={`status ${leave.status.toLowerCase()}`}
-                            >
+                            <span className={`status ${leave.status.toLowerCase()}`}>
                               {leave.status}
                             </span>
                           )}
@@ -314,48 +281,17 @@ const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
 
           {/* Assign Task Panel */}
           {activePanel === "assignTask" && (
-  <section className="assign-task-panel">
-                  <h3>Assign Task</h3>
-
-              {/* ASSIGN FORM */}
+            <section className="assign-task-panel">
+              <h3>Assign Task</h3>
               <form className="task-form" onSubmit={handleAssignTask}>
-                <input
-                  type="text"
-                  name="employeeId"
-                  placeholder="Employee ID"
-                  value={task.employeeId}
-                  onChange={handleTaskChange}
-                  required
-                />
-                <input
-                  type="text"
-                  name="title"
-                  placeholder="Task Title"
-                  value={task.title}
-                  onChange={handleTaskChange}
-                  required
-                />
-                <textarea
-                  name="description"
-                  placeholder="Task Description"
-                  value={task.description}
-                  onChange={handleTaskChange}
-                  required
-                />
-                <input
-                  type="date"
-                  name="deadline"
-                  value={task.deadline}
-                  onChange={handleTaskChange}
-                  min={new Date().toISOString().split("T")[0]}
-                  required
-                />
+                <input type="text" name="employeeId" placeholder="Employee ID" value={task.employeeId} onChange={handleTaskChange} required />
+                <input type="text" name="title" placeholder="Task Title" value={task.title} onChange={handleTaskChange} required />
+                <textarea name="description" placeholder="Task Description" value={task.description} onChange={handleTaskChange} required />
+                <input type="date" name="deadline" value={task.deadline} onChange={handleTaskChange} min={new Date().toISOString().split("T")[0]} required />
                 <button type="submit">Assign Task</button>
               </form>
 
-              {/* ASSIGNED TASKS TABLE */}
               <h3 style={{ marginTop: "30px" }}>Assigned Tasks</h3>
-
               {assignedTasks.length === 0 ? (
                 <p>No tasks assigned yet</p>
               ) : (
@@ -381,13 +317,11 @@ const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
                         </td>
                       </tr>
                     ))}
-
                   </tbody>
                 </table>
               )}
             </section>
           )}
-
 
           {/* Employees Panel */}
           {activePanel === "employees" && (
@@ -404,10 +338,7 @@ const COLORS = ["#ff6b6b", "#4dabf7", "#51cf66"];
                         <h4>{emp.name}</h4>
                         <h4>{emp._id}</h4>
                         <span className="role-badge">{emp.role}</span>
-                        <button
-                          className="delete-badge"
-                          onClick={() => handleDelete(emp._id)}
-                        >
+                        <button className="delete-badge" onClick={() => handleDelete(emp._id)}>
                           🗑 Delete
                         </button>
                       </div>
