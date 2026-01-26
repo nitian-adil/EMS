@@ -8,7 +8,7 @@ export default function EmployeeDashboard() {
 
   const [activeTab, setActiveTab] = useState("home");
   const [tasks, setTasks] = useState([]);
-
+const [employeeName, setEmployeeName] = useState("Employee");
   const [form, setForm] = useState({
     leaveType: "",
     fromDate: "",
@@ -17,6 +17,13 @@ export default function EmployeeDashboard() {
   });
 
   const [myLeaves, setMyLeaves] = useState([]);
+  const formatName = (name = "") =>
+  name
+    .toLowerCase()
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
 
   // ---------------- LOGOUT ----------------
   const handleLogout = () => {
@@ -24,12 +31,31 @@ export default function EmployeeDashboard() {
     localStorage.removeItem("user");
     navigate("/login");
   };
+  
+  const fetchLoggedInEmployee = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await api.get("/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (res.data?.name) {
+      setEmployeeName(formatName(res.data.name));
+    }
+  } catch (err) {
+    console.error(err);
+    navigate("/login");
+  }
+};
+
+  
+
 
   //-----------------fetch my task --------------
   const fetchMyTasks = async () => {
     try {
       const token = localStorage.getItem("token");
-
       const res = await api.get("/tasks/my", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -48,36 +74,35 @@ export default function EmployeeDashboard() {
 
 
   const totalTasks = tasks.length;
-const pendingTasks = tasks.filter(
-  (t) => t.status === "ASSIGNED" || t.status === "ACCEPTED"
-).length;
-const completedTasks = tasks.filter((t) => t.status === "COMPLETED").length;
+  const pendingTasks = tasks.filter(
+    (t) => t.status === "ASSIGNED" || t.status === "ACCEPTED"
+  ).length;
+  const completedTasks = tasks.filter((t) => t.status === "COMPLETED").length;
 
-const totalLeaves = myLeaves.length;
+  const totalLeaves = myLeaves.length;
 
-const user = JSON.parse(localStorage.getItem("user"));
-
+  // const user = JSON.parse(localStorage.getItem("user"));
 
   //------------------------Take action ---------------
- const handleTaskAction = async (taskId, action) => {
-  try {
-    const token = localStorage.getItem("token");
+  const handleTaskAction = async (taskId, action) => {
+    try {
+      const token = localStorage.getItem("token");
 
-    await api.patch(
-      `/tasks/${taskId}/${action}`,
-      {}, // no body needed
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+      await api.patch(
+        `/tasks/${taskId}/${action}`,
+        {}, // no body needed
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    alert(`Task ${action}ed successfully`);
-    fetchMyTasks(); // refresh UI
-  } catch (err) {
-    console.error(err);
-    alert(err.response?.data?.message || "Failed to update task");
-  }
-};
+      alert(`Task ${action}ed successfully`);
+      fetchMyTasks(); // refresh UI
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to update task");
+    }
+  };
 
 
 
@@ -123,7 +148,6 @@ const user = JSON.parse(localStorage.getItem("user"));
   const fetchMyLeaves = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log("TOKEN FROM LS:", token);
 
       const res = await api.get("/leaves/my", {
         headers: { Authorization: `Bearer ${token}` },
@@ -138,6 +162,7 @@ const user = JSON.parse(localStorage.getItem("user"));
   useEffect(() => {
     fetchMyLeaves();
     fetchMyTasks();
+      fetchLoggedInEmployee();
   }, []);
 
   return (
@@ -148,12 +173,12 @@ const user = JSON.parse(localStorage.getItem("user"));
 
         <ul className="sidebar-menu">
 
-<li
-  className={`sidebar-item ${activeTab === "home" ? "active" : ""}`}
-  onClick={() => setActiveTab("home")}
->
-  Home
-</li>
+          <li
+            className={`sidebar-item ${activeTab === "home" ? "active" : ""}`}
+            onClick={() => setActiveTab("home")}
+          >
+            Home
+          </li>
 
 
           <li
@@ -187,44 +212,44 @@ const user = JSON.parse(localStorage.getItem("user"));
       <main className="main-content">
         {/* APPLY LEAVE */}
 
-{activeTab === "home" && (
-  <div className="employee-home">
-    <h2 className="dashboard-heading">
-      Welcome {user?.name || "Employee"} 👋
-    </h2>
+        {activeTab === "home" && (
+          <div className="employee-home">
+            <h2 className="dashboard-heading">
+Welcome {employeeName} 👋
+            </h2>
 
-    <p className="home-date">
-      {new Date().toLocaleDateString("en-IN", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })}
-    </p>
+            <p className="home-date">
+              {new Date().toLocaleDateString("en-IN", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </p>
 
-    <div className="home-cards">
-      <div className="home-card">
-        <h3>{totalTasks}</h3>
-        <p>Total Tasks</p>
-      </div>
+            <div className="home-cards">
+              <div className="home-card">
+                <h3>{totalTasks}</h3>
+                <p>Total Tasks</p>
+              </div>
 
-      <div className="home-card warning">
-        <h3>{pendingTasks}</h3>
-        <p>Pending Tasks</p>
-      </div>
+              <div className="home-card warning">
+                <h3>{pendingTasks}</h3>
+                <p>Pending Tasks</p>
+              </div>
 
-      <div className="home-card success">
-        <h3>{completedTasks}</h3>
-        <p>Completed Tasks</p>
-      </div>
+              <div className="home-card success">
+                <h3>{completedTasks}</h3>
+                <p>Completed Tasks</p>
+              </div>
 
-      <div className="home-card info">
-        <h3>{totalLeaves}</h3>
-        <p>Leave Requests</p>
-      </div>
-    </div>
-  </div>
-)}
+              <div className="home-card info">
+                <h3>{totalLeaves}</h3>
+                <p>Leave Requests</p>
+              </div>
+            </div>
+          </div>
+        )}
 
 
 
@@ -295,21 +320,21 @@ const user = JSON.parse(localStorage.getItem("user"));
                       </span>
                     </div>
 
-                   <div className="leave-card-body">
-  <p>
-    <strong>Reason:</strong> {leave.reason}
-  </p>
+                    <div className="leave-card-body">
+                      <p>
+                        <strong>Reason:</strong> {leave.reason}
+                      </p>
 
-  <p>
-    <strong>From:</strong>{" "}
-    {new Date(leave.fromDate).toLocaleDateString()}
-  </p>
+                      <p>
+                        <strong>From:</strong>{" "}
+                        {new Date(leave.fromDate).toLocaleDateString()}
+                      </p>
 
-  <p>
-    <strong>To:</strong>{" "}
-    {new Date(leave.toDate).toLocaleDateString()}
-  </p>
-</div>
+                      <p>
+                        <strong>To:</strong>{" "}
+                        {new Date(leave.toDate).toLocaleDateString()}
+                      </p>
+                    </div>
 
 
                     <div className="leave-card-footer">
@@ -358,23 +383,23 @@ const user = JSON.parse(localStorage.getItem("user"));
                       </span>
                     </div>
 
-        <div className="leave-card-body">
-  <p>
-    <strong>Description:</strong> {task.description}
-  </p>
+                    <div className="leave-card-body">
+                      <p>
+                        <strong>Description:</strong> {task.description}
+                      </p>
 
-  <p>
-    <strong>Assigned On:</strong>{" "}
-    {new Date(task.createdAt).toLocaleDateString()}
-  </p>
+                      <p>
+                        <strong>Assigned On:</strong>{" "}
+                        {new Date(task.createdAt).toLocaleDateString()}
+                      </p>
 
-  {task.deadline && (
-    <p>
-      <strong>Deadline:</strong>{" "}
-      {new Date(task.deadline).toLocaleDateString()}
-    </p>
-  )}
-</div>
+                      {task.deadline && (
+                        <p>
+                          <strong>Deadline:</strong>{" "}
+                          {new Date(task.deadline).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
 
 
                     <div className="leave-card-footer task-actions">

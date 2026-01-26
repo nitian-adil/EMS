@@ -12,6 +12,13 @@ import {
 } from "recharts";
 
 const AdminDashboard = () => {
+   const formatName = (name = "") => {
+  return name
+    .toLowerCase()
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
   const navigate = useNavigate();
   const [leaves, setLeaves] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -24,10 +31,8 @@ const AdminDashboard = () => {
   });
   const [activePanel, setActivePanel] = useState("");
   const [loggedInUserId, setLoggedInUser] = useState(null);
-
-  const user = JSON.parse(localStorage.getItem("user"));
-  const adminName = user?.name || "Admin";
-
+  
+const [adminName, setAdminName] = useState("Admin");
   const token = localStorage.getItem("token");
 
   const roleCounts = {
@@ -64,17 +69,28 @@ const AdminDashboard = () => {
   };
 
   // Fetch logged-in user
-  const fetchLoggedInUser = async () => {
-    try {
-      const res = await api.get("/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setLoggedInUser(res.data._id);
-    } catch (err) {
-      console.error(err);
-      navigate("/login");
+const fetchLoggedInUser = async () => {
+  try {
+    const res = await api.get("/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setLoggedInUser(res.data._id);
+
+    // ✅ SET ADMIN NAME SAFELY
+    if (res.data?.name) {
+      setAdminName(formatName(res.data.name));
     }
-  };
+
+  } catch (err) {
+    console.error(err);
+    navigate("/login");
+  }
+};
+
+
+ 
+
 
   // Fetch tasks
   const fetchTasks = async () => {
@@ -321,24 +337,28 @@ const AdminDashboard = () => {
               <div className="employee-selector">
                 <h4>Select Employee</h4>
 
-              <div className="employee-grid-boxes">
-  {employees
-    .filter(emp => ["EMPLOYEE", "HR"].includes(emp.role?.toUpperCase().trim()))
-    .map(emp => (
-      <div
-        key={emp._id}
-        className={`employee-card-box ${task.employeeId === emp._id ? "selected" : ""}`}
-        onClick={() => setTask(prev => ({ ...prev, employeeId: emp._id }))}
-      >
-        <div className="employee-avatar">👤</div>
+                <div className="employee-grid-boxes">
+                  {employees
+                    .filter(emp => ["EMPLOYEE", "HR"].includes(emp.role?.toUpperCase().trim()))
+                    .map(emp => (
+                      <div
+                        key={emp._id}
+                        className={`employee-card-box ${task.employeeId === emp._id ? "selected" : ""}`}
+                        onClick={() => setTask(prev => ({ ...prev, employeeId: emp._id }))}
+                      >
+                        <div className="employee-avatar">👤</div>
 
-        <div className="employee-info">
-          <span className="employee-name">{emp.name}</span>
-          <span className="employee-role">{emp.role}</span> {/* Only show designation */}
-        </div>
-      </div>
-    ))}
-</div>
+                        <div className="employee-info">
+                          <span className="employee-name">
+                            {emp.name
+                              ? emp.name.charAt(0).toUpperCase() + emp.name.slice(1)
+                              : ""}
+                          </span>
+                          <span className="employee-role">{emp.role}</span> {/* Only show designation */}
+                        </div>
+                      </div>
+                    ))}
+                </div>
 
               </div>
 
