@@ -16,7 +16,7 @@ const {
 /**
  * ADMIN assigns task
  */
-router.post("/assign",auth, role("ADMIN"), assignTask);
+router.post("/assign",auth, role("ADMIN","HR"), assignTask);
 router.get("/", auth, role("ADMIN"), getAllTasks);
 
 /**

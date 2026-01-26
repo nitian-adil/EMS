@@ -179,18 +179,46 @@ const AdminDashboard = () => {
       <div className="admin-dashboard-body">
         {/* Sidebar */}
         <aside className="admin-sidebar">
-          <button onClick={() => setActivePanel("")}>🏠 Home</button>
-<button onClick={() => setActivePanel("leaves")}>
-  🔔 Leave Requests
-  {leaves.filter(l => l.status === "PENDING").length > 0 && (
-    <span className="pending-count">
-      {leaves.filter(l => l.status === "PENDING").length}
-    </span>
-  )}
-</button>
-          <button onClick={() => setActivePanel("assignTask")}>📌 Assign Task</button>
-          <button onClick={() => setActivePanel("employees")}>👥 Employees</button>
+          <button
+            className={`admin-sidebar-btn ${activePanel === "" ? "active" : ""}`}
+            onClick={() => setActivePanel("")}
+          >
+            <span>🏠 Home</span>
+            {activePanel === "" && <span className="admin-arrow">▶</span>}
+          </button>
+
+          <button
+            className={`admin-sidebar-btn ${activePanel === "leaves" ? "active" : ""}`}
+            onClick={() => setActivePanel("leaves")}
+          >
+            <span>
+              🔔 Leave Requests
+              {leaves.filter(l => l.status === "PENDING").length > 0 && (
+                <span className="pending-count">
+                  {leaves.filter(l => l.status === "PENDING").length}
+                </span>
+              )}
+            </span>
+            {activePanel === "leaves" && <span className="admin-arrow">▶</span>}
+          </button>
+
+          <button
+            className={`admin-sidebar-btn ${activePanel === "assignTask" ? "active" : ""}`}
+            onClick={() => setActivePanel("assignTask")}
+          >
+            <span>📌 Assign Task</span>
+            {activePanel === "assignTask" && <span className="admin-arrow">▶</span>}
+          </button>
+
+          <button
+            className={`admin-sidebar-btn ${activePanel === "employees" ? "active" : ""}`}
+            onClick={() => setActivePanel("employees")}
+          >
+            <span>👥 Employees</span>
+            {activePanel === "employees" && <span className="admin-arrow">▶</span>}
+          </button>
         </aside>
+
 
         {/* Main Content */}
         <main className="admin-main">
@@ -284,12 +312,37 @@ const AdminDashboard = () => {
             <section className="assign-task-panel">
               <h3>Assign Task</h3>
               <form className="task-form" onSubmit={handleAssignTask}>
-                <input type="text" name="employeeId" placeholder="Employee ID" value={task.employeeId} onChange={handleTaskChange} required />
                 <input type="text" name="title" placeholder="Task Title" value={task.title} onChange={handleTaskChange} required />
                 <textarea name="description" placeholder="Task Description" value={task.description} onChange={handleTaskChange} required />
                 <input type="date" name="deadline" value={task.deadline} onChange={handleTaskChange} min={new Date().toISOString().split("T")[0]} required />
                 <button type="submit">Assign Task</button>
               </form>
+              {/* Employee Selector */}
+              <div className="employee-selector">
+                <h4>Select Employee</h4>
+
+              <div className="employee-grid-boxes">
+  {employees
+    .filter(emp => ["EMPLOYEE", "HR"].includes(emp.role?.toUpperCase().trim()))
+    .map(emp => (
+      <div
+        key={emp._id}
+        className={`employee-card-box ${task.employeeId === emp._id ? "selected" : ""}`}
+        onClick={() => setTask(prev => ({ ...prev, employeeId: emp._id }))}
+      >
+        <div className="employee-avatar">👤</div>
+
+        <div className="employee-info">
+          <span className="employee-name">{emp.name}</span>
+          <span className="employee-role">{emp.role}</span> {/* Only show designation */}
+        </div>
+      </div>
+    ))}
+</div>
+
+              </div>
+
+
 
               <h3 style={{ marginTop: "30px" }}>Assigned Tasks</h3>
               {assignedTasks.length === 0 ? (
