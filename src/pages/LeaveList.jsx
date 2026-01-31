@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../api/axios";
+import api from "./api/axiosInstance";
 
 export default function LeaveList() {
   const [leaves, setLeaves] = useState([]);

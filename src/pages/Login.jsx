@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "./axios";
+import api from "./api/axiosInstance";
 import { AuthContext } from "../auth/AuthContext";
 import "./sytles/Login.css";
 

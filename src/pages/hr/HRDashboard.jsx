@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../sytles/HrDashboard.css";
-import api from "../axios";
+import api from "../api/axiosInstance";
 import {
   PieChart,
   Pie,

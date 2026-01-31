@@ -1,7 +1,6 @@
-import axios from "axios";
-
+import axios from 'axios'
 const api = axios.create({
-  baseURL: "https://ems-z77x.onrender.com",
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 // Add JWT token to every request automatically
