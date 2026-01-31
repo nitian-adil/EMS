@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "./axios";
+import api from "./api/axiosInstance";
 import "./sytles/Register.css"; // Import the new CSS
 
 function Register() {

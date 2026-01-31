@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "../axios";
+import axios from "../pages/api/axiosInstance";
 
 export default function LeaveNotifications() {
   const [leaves, setLeaves] = useState([]);
